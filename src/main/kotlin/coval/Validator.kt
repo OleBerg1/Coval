@@ -29,7 +29,7 @@ class Validator<E, T>(
 }
 
 class ValidatorClient<E, T>(
-    // TODO: Refactor to Vararg
+    // TODO: remove client, not needed anymore
     private val validators: List<Validator<E, T>>,
 ) {
     /*
@@ -39,7 +39,8 @@ class ValidatorClient<E, T>(
         * If there is no error, then transformations made by a validator will be kept.
         * If there is an error, then transformations made by that validator will be discarded.
     */
-    // TODO: Refactor accumulated errors to a map of Validators to Errors
+    // TODO: Refactor accumulated errors to a map of Validators to Errors -> This can actually be done for the Eithers
+    //  returned by Validator instead of the Validated.
     fun validate(value: T): Validated<T> =
         validators.fold(Validated(value, emptyList())) { acc, validator ->
             val result = validator(acc.value)
