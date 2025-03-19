@@ -5,12 +5,9 @@ import arrow.core.left
 import arrow.core.right
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import no.oleberg.Validator.Validator
-import no.oleberg.Validator.ValidatorClient
 import coval.ValidatorCombinators.and
 import coval.ValidatorCombinators.or
 import coval.ValidatorCombinators.then
-import coval.ValidatorCombinators.toValidator
 
 data class UserProfile(
     val name: String,

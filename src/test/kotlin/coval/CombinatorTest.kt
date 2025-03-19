@@ -4,13 +4,10 @@ import arrow.core.left
 import arrow.core.right
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import no.oleberg.Validator.Validator
 import coval.ValidatorCombinators.and
 import coval.ValidatorCombinators.or
 import coval.ValidatorCombinators.then
 import coval.ValidatorCombinators.toValidator
-import no.oleberg.Validator.ErrorJoining
-import no.oleberg.Validator.ValidatorClient
 
 class CombinatorTest: StringSpec({
     "Then should apply the first validator and then the second validator" {
@@ -125,10 +122,13 @@ class CombinatorTest: StringSpec({
         val person = Person("Alice", 30)
 
         val validator = ValidatorClient(listOf(transformingValidator, failingValidator))
+        val validator2 = ValidatorClient(transformingValidator, failingValidator)
 
         val validatedPerson = validator.validate(person)
+        val validatedPerson2 = validator2.validate(person)
 
         validatedPerson shouldBe Validated(Person("Bob", 30), listOf("This will always fail"))
+        validatedPerson2 shouldBe Validated(Person("Bob", 30), listOf("This will always fail"))
     }
 })
 

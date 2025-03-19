@@ -1,11 +1,9 @@
-package no.oleberg.Validator
+package coval
 
-import coval.Validated
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.left
-import java.util.logging.Logger
 
 typealias ValidatorFunction<E, T> = (T) -> Either<List<E>, T>
 typealias ErrorJoining<E> = ((List<E>) -> List<E>)
@@ -28,10 +26,18 @@ class Validator<E, T>(
     fun joinErrors(errorJoining: ErrorJoining<E>): Validator<E, T> = Validator(this, errorJoining)
 }
 
-class ValidatorClient<E, T>(
-    // TODO: remove client, not needed anymore
-    private val validators: List<Validator<E, T>>,
-) {
+class ValidatorClient<E, T> {
+    private val validators: List<Validator<E, T>>
+
+    constructor(vararg validators: Validator<E, T>) {
+        this.validators = validators.toList()
+    }
+
+    constructor(validators: List<Validator<E, T>>) {
+        this.validators = validators
+    }
+
+
     /*
         * This function will validate a value of type T using the validators provided in the constructor.
         * It will return a Validated object with the value and a list of error messages.

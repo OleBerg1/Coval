@@ -2,9 +2,6 @@ package coval
 
 import arrow.core.Either
 import arrow.core.left
-import no.oleberg.Validator.ErrorJoining
-import no.oleberg.Validator.Validator
-import no.oleberg.Validator.ValidatorFunction
 
 object ValidatorCombinators {
     fun <E, T> ValidatorFunction<E, T>.toValidator(errorJoining: ErrorJoining<E>? = null): Validator<E, T> = Validator(this, errorJoining)
