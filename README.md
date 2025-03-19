@@ -1,3 +1,4 @@
+[![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/OleBerg1/Coval/blob/main/LICENSE)
 # Coval
 #### Composable validation for Kotlin 
 
