@@ -8,6 +8,7 @@ import coval.ValidatorCombinators.and
 import coval.ValidatorCombinators.or
 import coval.ValidatorCombinators.then
 import coval.ValidatorCombinators.toValidator
+import io.kotest.assertions.throwables.shouldThrow
 
 class CombinatorTest: StringSpec({
     "Then should apply the first validator and then the second validator" {
@@ -112,6 +113,18 @@ class CombinatorTest: StringSpec({
         validatedPerson shouldBe Validated(Person("Bob", 30), listOf())
         validatedPerson2 shouldBe Validated(Person("John", 30), listOf())
         validatedPerson3 shouldBe Validated(Person("Ada", 30), listOf("Name must be John"))
+    }
+
+    "Validated.throwIfFailed should throw a specified exception if there are errors, otherwise return itself" {
+        val validated = Validated(Person("Alice", 30), listOf("Error 1", "Error 2"))
+
+        shouldThrow<IllegalArgumentException> {
+            validated.throwIfFailed { messages -> IllegalArgumentException(messages.joinToString("\n")) }
+        }.message shouldBe "Error 1\nError 2"
+
+        val validated2 = Validated(Person("Alice", 30), listOf())
+
+        validated2.throwIfFailed { _ -> AssertionError("This should not be throwing") } shouldBe validated2
     }
 
 

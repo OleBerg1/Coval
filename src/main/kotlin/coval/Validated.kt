@@ -6,6 +6,10 @@ data class Validated<T>(
     val value: T,
     val errors: List<String>
 ){
+    fun throwIfFailed(throwable: (List<String>) -> Throwable): Validated<T> =
+        if (errors.isEmpty()) this
+        else throw throwable(errors)
+
     infix operator fun plus(other: Validated<T>): Validated<T> {
         if (this.value != other.value) {
             throw IllegalArgumentException("Cannot concatenate two Validated objects with different values")
