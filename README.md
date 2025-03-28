@@ -9,6 +9,44 @@ It also provides tooling for how to handle any error produced by a validation, a
 
 Coval relies on Arrow.Either for its flow control.
 
+The philosophy behind Coval is to make validation as simple as possible, while still being powerful and flexible.
+
+Coval itself is built around the idea of being able to define rules as named variables, and pass them on, and transform then into new rules through combinators.
+A ValidatorFunction, is just a type alias for this type:
+```kotlin
+typealias ValidatorFunction<E, T> = (T) -> Either<List<E>, T>
+
+val rule = {
+    input ->    if (something) input.right() 
+                else listOf("Error").left() 
+}
+```
+This is a typical rule, and produces what is a ValidatorFunction, it is the base of the library, and can be used to create Validators.
+```kotlin
+rule.toValidator()
+```
+
+Validation rules are supposed to be structured, named rules, that allow you to write validation at a high level, close to natural langauge.
+Assume we have two rules, and a simple Person type defined. let's call them `validateName` and `validateAge`. Coval then lets you combine these rules if that makes sense.
+```kotlin
+val validateNameAndAge = validateName and validateAge
+```
+
+is perfectly valid, and lets you see what is supposed to happen just through naming.
+
+> [!CAUTION]
+> Coval is designed to be used for pure functions, and adding effectful code to your validation rules will make them harder to test and reason about.
+> It is recommended to keep your validation rules as pure as possible, and handle side effects in a separate layer.
+
+Validators contains functions for handling validation, and allow you to shape the flow of your validation.
+
+For instance through aggregating errors.
+
+`.toValidator()` accepts a aggregator-function of type `List<E> -> List<E>`, this can be used to join errors.
+This can be useful both for making error messages, or for joining replacement values in whichever way makes the most sense.
+
+
+
 Example:
 ```kotlin
 data class Person(val name: String, val age: Int)
@@ -21,7 +59,7 @@ val validatePerson = validateName then validateAge // If person has no name, age
 val validateAgeOrName = validateName or validateAge // If person has no name, age is validated
 ```
 
-Since any resulting validator from a combination will just be a new validator, this concept can go on for ever.
+Since any resulting validator from a combination will just be a new validator, this can go on forever.
 
 A Validator can also force a transformation on its output value, to handle anticipated errors or to transform the output value.
 
