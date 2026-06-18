@@ -66,7 +66,7 @@ A Validator can also force a transformation on its output value, to handle antic
 ```kotlin
 val john = Person("John", 30)
 val validateName = { p: Person ->
-    when(Person.name) {
+    when(p.name) {
         "John" -> p.copy(name = "Jon").right()
         "Jon" -> listOf("Name can't be Jon").left()
         else -> listOf("Name is invalid").left()
@@ -90,7 +90,7 @@ Meaning if you have a Validator of type `Validator<A, A>`, you can set up failed
 
 ```kotlin
 // Will return "Name is empty and Age is invalid" when ran.
-// - the joining function is enclosed  within the validators, and will be called when the validator is run.
+// - the joining function is enclosed within the validators, and will be called when the validator is run.
 val validatePerson = (validateName or validateAge)
-    .joinErrors { errors: List<String> -> listOf(errors.joinToString = " and ") }
+    .joinErrors { errors: List<String> -> listOf(errors.joinToString(separator = " and ")) }
 ```

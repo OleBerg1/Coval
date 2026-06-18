@@ -55,16 +55,25 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <configuration>
-                    <mainClass>MainKt</mainClass>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Pin every JUnit Platform / Jupiter artifact to one coherent version.
+                 kotest-runner-junit5 5.9.1 drags in junit-platform-engine 1.8.2 while
+                 jupiter 5.10 brings junit-platform-launcher 1.10.1, and the split
+                 (launcher 1.10 + engine 1.8.2) throws NoSuchMethodError
+                 TestDescriptor.getAncestors() before any test runs. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.10.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
