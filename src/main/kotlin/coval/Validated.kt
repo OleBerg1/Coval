@@ -2,15 +2,15 @@ package coval
 
 import arrow.core.Either
 
-data class Validated<T>(
+data class Validated<E, T>(
     val value: T,
-    val errors: List<String>
+    val errors: List<E>
 ){
-    fun throwIfFailed(throwable: (List<String>) -> Throwable): Validated<T> =
+    fun throwIfFailed(throwable: (List<E>) -> Throwable): Validated<E, T> =
         if (errors.isEmpty()) this
         else throw throwable(errors)
 
-    infix operator fun plus(other: Validated<T>): Validated<T> {
+    infix operator fun plus(other: Validated<E, T>): Validated<E, T> {
         if (this.value != other.value) {
             throw IllegalArgumentException("Cannot concatenate two Validated objects with different values")
         }
@@ -19,11 +19,9 @@ data class Validated<T>(
     }
 }
 
-fun<E, T> Either<List<E>, T>.toValidated(value: T, transform: (E) -> String = ::defaultTransform): Validated<T> {
+fun<E, T> Either<List<E>, T>.toValidated(value: T): Validated<E, T> {
     return when (this) {
-        is Either.Left -> Validated(value, this.value.map(transform))
+        is Either.Left -> Validated(value, this.value)
         is Either.Right -> Validated(this.value, emptyList())
     }
 }
-
-private fun<E> defaultTransform(e: E): String =  "$e"

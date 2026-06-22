@@ -26,7 +26,7 @@ class Validator<E, T>(
     fun joinErrors(errorJoining: ErrorJoining<E>): Validator<E, T> = Validator(this, errorJoining)
 }
 
-class ValidatorClient<E, T> {
+class ValidationSchema<E, T> {
     private val validators: List<Validator<E, T>>
 
     constructor(vararg validators: Validator<E, T>) {
@@ -40,18 +40,18 @@ class ValidatorClient<E, T> {
 
     /*
         * This function will validate a value of type T using the validators provided in the constructor.
-        * It will return a Validated object with the value and a list of error messages.
+        * It will return a Validated object with the value and a list of errors of type E.
         *
         * If there is no error, then transformations made by a validator will be kept.
         * If there is an error, then transformations made by that validator will be discarded.
     */
     // TODO: Refactor accumulated errors to a map of Validators to Errors -> This can actually be done for the Eithers
     //  returned by Validator instead of the Validated.
-    fun validate(value: T): Validated<T> =
-        validators.fold(Validated(value, emptyList())) { acc, validator ->
+    fun validate(value: T): Validated<E, T> =
+        validators.fold(Validated(value, emptyList<E>())) { acc, validator ->
             val result = validator(acc.value)
             when(result) {
-                is Left -> Validated(acc.value, acc.errors + result.value.map { "$it" })
+                is Left -> Validated(acc.value, acc.errors + result.value)
                 is Right -> Validated(result.value, acc.errors)
             }
         }

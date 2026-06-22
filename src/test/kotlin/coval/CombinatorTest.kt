@@ -79,7 +79,7 @@ class CombinatorTest: StringSpec({
         val person = Person("Alice", 30)
         val nameThenName = nameValidator then nameValidator
 
-        val validatedPerson: Validated<Person> = nameThenName(person).toValidated(person)
+        val validatedPerson: Validated<String, Person> = nameThenName(person).toValidated(person)
 
         validatedPerson shouldBe Validated(Person("Alice", 30), listOf("Name must be John"))
     }
@@ -105,13 +105,13 @@ class CombinatorTest: StringSpec({
         val person2 = Person("John", 30)
         val person3 = Person("Ada", 30)
 
-        val validator = ValidatorClient(listOf(personValidator))
+        val validator = ValidationSchema(listOf(personValidator))
         val validatedPerson = validator.validate(person)
         val validatedPerson2 = validator.validate(person2)
         val validatedPerson3 = validator.validate(person3)
 
-        validatedPerson shouldBe Validated(Person("Bob", 30), listOf())
-        validatedPerson2 shouldBe Validated(Person("John", 30), listOf())
+        validatedPerson shouldBe Validated(Person("Bob", 30), emptyList<String>())
+        validatedPerson2 shouldBe Validated(Person("John", 30), emptyList<String>())
         validatedPerson3 shouldBe Validated(Person("Ada", 30), listOf("Name must be John"))
     }
 
@@ -122,20 +122,20 @@ class CombinatorTest: StringSpec({
             validated.throwIfFailed { messages -> IllegalArgumentException(messages.joinToString("\n")) }
         }.message shouldBe "Error 1\nError 2"
 
-        val validated2 = Validated(Person("Alice", 30), listOf())
+        val validated2 = Validated(Person("Alice", 30), emptyList<String>())
 
         validated2.throwIfFailed { _ -> AssertionError("This should not be throwing") } shouldBe validated2
     }
 
 
-    "ValidatorClient with several validators should store any successful transformations" {
+    "ValidationSchema with several validators should store any successful transformations" {
         val transformingValidator: Validator<String, Person> = { person: Person -> Person("Bob", person.age).right() }.toValidator()
         val failingValidator: Validator<String, Person>  = { _: Person -> listOf("This will always fail").left()}.toValidator()
 
         val person = Person("Alice", 30)
 
-        val validator = ValidatorClient(listOf(transformingValidator, failingValidator))
-        val validator2 = ValidatorClient(transformingValidator, failingValidator)
+        val validator = ValidationSchema(listOf(transformingValidator, failingValidator))
+        val validator2 = ValidationSchema(transformingValidator, failingValidator)
 
         val validatedPerson = validator.validate(person)
         val validatedPerson2 = validator2.validate(person)

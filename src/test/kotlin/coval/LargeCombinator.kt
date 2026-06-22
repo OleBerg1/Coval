@@ -31,8 +31,8 @@ class LargeCombinator: StringSpec({
     }
 
     "Validate user with multiple validators" {
-        val validator = ValidatorClient<String, UserProfile>(listOf(validateName, validateEmail, validateAge, validateStreet, validateCity, validateZipCode))
-        validator.validate(user) shouldBe Validated(user, listOf())
+        val validator = ValidationSchema<String, UserProfile>(listOf(validateName, validateEmail, validateAge, validateStreet, validateCity, validateZipCode))
+        validator.validate(user) shouldBe Validated(user, emptyList<String>())
 
         validator.validate(emptyUser) shouldBe Validated(emptyUser, listOf(
             "Name cannot be empty",
