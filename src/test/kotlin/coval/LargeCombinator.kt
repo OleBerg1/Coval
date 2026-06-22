@@ -129,39 +129,3 @@ val validateUser = (
         then validateAddress)
 
 val validateAdmin = validateUser then isAdmin
-
-class Person {
-    val name: String
-    val age: Int
-
-    constructor(name: String, age: Int) {
-        this.name   = validateNameToValidated(name)
-        this.age    = validateAge(age)
-    }
-
-    // Make private constructor, construct through that and validate it, in public constructor
-    // -- that way you can always accumulate errors and throw them when stuff broken --
-    companion object {
-        val validateNameToValidated = { name: String ->
-            val validateName: ValidatorFunction<String, String> = { name ->
-                when(name) {
-                "John" -> name.right()
-                else -> listOf("Name must be John").left()
-            } }
-
-            validateName
-                .toValidator()(name)
-                .toValidated(name)
-                .throwIfFailed { IllegalArgumentException("Name for profile $it failed validation") }
-                .value
-        }
-
-        val validateAge = { age: Int ->
-            { age: Int -> if (age > 0) age.right() else listOf("Age must be greater than 0").left() }
-                .toValidator()(age)
-                .toValidated(age)
-                .throwIfFailed { IllegalArgumentException(it.reduceIndexed { index, acc, v -> "$acc\n$index: $v" }) }
-                .value
-        }
-    }
-}

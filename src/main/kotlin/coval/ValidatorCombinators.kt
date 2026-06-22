@@ -33,10 +33,15 @@ object ValidatorCombinators {
      */
     infix fun <E, T> Validator<E, T>.and(other: Validator<E, T>): Validator<E, T> = Validator({ t ->
         when (val result = this(t)) {
-            is Either.Left -> result
+            is Either.Left -> {
+                when (val otherResult = other(t)) {
+                    is Either.Left -> (result.value + otherResult.value).left()
+                    is Either.Right -> result
+                }
+            }
             is Either.Right -> {
                 when (val otherResult = other(t)) {
-                    is Either.Left -> result
+                    is Either.Left -> otherResult
                     is Either.Right -> otherResult
                 }
             }
